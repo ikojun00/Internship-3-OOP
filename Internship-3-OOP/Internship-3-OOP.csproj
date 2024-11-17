@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Project.cs" />
+    <Compile Include="Classes\Task.cs" />
+    <Compile Include="Enum\ProjectStatus.cs" />
+    <Compile Include="Enum\TaskStatus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
