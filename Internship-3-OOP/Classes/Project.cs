@@ -14,13 +14,11 @@ namespace Internship_3_OOP.Classes
         private DateTime startDate;
         private DateTime endDate;
         private ProjectStatus status;
-        private Guid id;
-
-        public Guid Id { get; private set; }
+        public Guid Id { get; }
         public string Name
         {
             get => name;
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("Ime projekta ne može biti prazno.");
@@ -31,7 +29,7 @@ namespace Internship_3_OOP.Classes
         public string Description
         {
             get => description;
-            set
+            private set
             {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("Opis projekta ne može biti prazan.");
@@ -42,13 +40,13 @@ namespace Internship_3_OOP.Classes
         public DateTime StartDate
         {
             get => startDate;
-            set => startDate = value;
+            private set => startDate = value;
         }
 
         public DateTime EndDate
         {
             get => endDate;
-            set
+            private set
             {
                 if (value < startDate)
                     throw new ArgumentException("Datum završetka ne može biti prije datuma početka.");

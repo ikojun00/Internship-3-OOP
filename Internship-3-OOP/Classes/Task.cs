@@ -18,31 +18,56 @@ namespace Internship_3_OOP.Classes
         public string Name
         {
             get => name;
-            set => name = value;
+            private set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Ime projekta ne može biti prazno.");
+                name = value;
+            }
         }
 
         public string Description
         {
             get => description;
-            set => description = value;
+            private set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Opis projekta ne može biti prazan.");
+                description = value;
+            }
         }
 
         public DateTime Deadline
         {
             get => deadline;
-            set => deadline = value;
+            private set
+            {
+                if (value < DateTime.Now)
+                    throw new ArgumentException("Rok ne može biti u prošlosti.");
+                deadline = value;
+            }
         }
 
         public TaskStatus Status
         {
             get => status;
-            set => status = value;
+            set
+            {
+                if (status == TaskStatus.Completed)
+                    throw new InvalidOperationException("Ne možeš modificirati završen zadatak.");
+                status = value;
+            }
         }
 
         public int Duration
         {
             get => duration;
-            set => duration = value;
+            private set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("Trajanje zadatka mora biti veće od 0 minuta.");
+                duration = value;
+            }
         }
 
         public Project Project
