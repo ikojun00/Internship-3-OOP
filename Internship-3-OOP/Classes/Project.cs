@@ -14,17 +14,29 @@ namespace Internship_3_OOP.Classes
         private DateTime startDate;
         private DateTime endDate;
         private ProjectStatus status;
+        private Guid id;
 
+        public Guid Id { get; private set; }
         public string Name
         {
             get => name;
-            set => name = value;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Ime projekta ne može biti prazno.");
+                name = value;
+            }
         }
 
         public string Description
         {
             get => description;
-            set => description = value;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Opis projekta ne može biti prazan.");
+                description = value;
+            }
         }
 
         public DateTime StartDate
@@ -36,20 +48,31 @@ namespace Internship_3_OOP.Classes
         public DateTime EndDate
         {
             get => endDate;
-            set => endDate = value;
+            set
+            {
+                if (value < startDate)
+                    throw new ArgumentException("Datum završetka ne može biti prije datuma početka.");
+                endDate = value;
+            }
         }
 
         public ProjectStatus Status
         {
             get => status;
-            set => status = value;
+            set
+            {
+                if (status == ProjectStatus.Completed)
+                    throw new InvalidOperationException("Ne možeš modificirati završen projekt.");
+                status = value;
+            }
         }
 
         public Project(string name, string description, DateTime startDate, DateTime endDate)
         {
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
-            this.startDate = startDate;
+            StartDate = startDate;
             EndDate = endDate;
             Status = ProjectStatus.Active;
         }
