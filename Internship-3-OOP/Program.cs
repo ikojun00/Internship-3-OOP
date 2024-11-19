@@ -16,10 +16,10 @@ namespace Internship_3_OOP
             var tasks = projectTasks[project];
             for (int i = 0; i < tasks.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {tasks[i].Name}");
+                Console.WriteLine($"{i + 1} - {tasks[i].Name}");
             }
 
-            Console.Write("\nOdaberite zadatak (broj): ");
+            Console.Write($"\nOdaberite zadatak iz projekta '{project.Name}' (broj): ");
             if (!int.TryParse(Console.ReadLine(), out int option) || option < 1 || option > tasks.Count)
                 throw new ArgumentException("Nevaljan odabir zadatka.");
 
@@ -30,7 +30,7 @@ namespace Internship_3_OOP
             var projects = projectTasks.Keys.ToList();
             for (int i = 0; i < projects.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {projects[i].Name}");
+                Console.WriteLine($"{i + 1} - {projects[i].Name}");
             }
 
             Console.Write("\nOdaberite projekt (broj): ");
@@ -283,9 +283,9 @@ namespace Internship_3_OOP
                 return;
             }
 
-            Console.WriteLine("1 - Aktivni");
+            Console.WriteLine("1 - Aktivan");
             Console.WriteLine("2 - Na čekanju");
-            Console.WriteLine("3 - Završeni");
+            Console.WriteLine("3 - Završen");
             Console.Write("\nOdabir: ");
             string choice = Console.ReadLine();
             ProjectStatus newStatus;
@@ -308,6 +308,13 @@ namespace Internship_3_OOP
 
 
             project.Status = newStatus;
+            if (newStatus == ProjectStatus.Completed)
+            {
+                foreach (var task in projectTasks[project]) {
+                    if(task.Status != TaskStatus.Completed)
+                    task.Status = TaskStatus.Completed; 
+                }
+            }
             Console.WriteLine("\nStatus projekta je uspješno ažuriran.");
         }
 
@@ -349,6 +356,12 @@ namespace Internship_3_OOP
 
         private static void DeleteTaskFromProject(Project project)
         {
+            if (project.Status == ProjectStatus.Completed)
+            {
+                Console.WriteLine("Ne možete brisati zadatke iz završenog projekta.");
+                return;
+            }
+
             if (!projectTasks[project].Any())
             {
                 Console.WriteLine("Nema zadataka za brisanje.");
@@ -375,6 +388,49 @@ namespace Internship_3_OOP
             int minutes = totalMinutes % 60;
 
             Console.WriteLine($"Ukupno očekivano vrijeme za aktivne zadatke: {hours} sati i {minutes} minuta");
+        }
+        private static void ShowTaskDetails(Task task)
+        {
+            Console.WriteLine($"Detalji projekta '{task.Name}':");
+            Console.WriteLine($"Opis: {task.Description}");
+            Console.WriteLine($"Status: {task.Status}");
+            Console.WriteLine($"Rok: {task.Deadline:dd.MM.yyyy.}");
+            Console.WriteLine($"Trajanje: {task.Duration} minuta");
+        }
+        private static void UpdateTaskStatus(Task task)
+        {
+            if (task.Status == TaskStatus.Completed)
+            {
+                Console.WriteLine("Ne možete mijenjati status završenog zadatka.");
+                return;
+            }
+
+            Console.WriteLine("1 - Aktivan");
+            Console.WriteLine("2 - Završen");
+            Console.WriteLine("3 - Odgođen");
+            Console.Write("\nOdabir: ");
+            string choice = Console.ReadLine();
+            TaskStatus newStatus;
+
+            switch (choice)
+            {
+                case "1":
+                    newStatus = TaskStatus.Active;
+                    break;
+                case "2":
+                    newStatus = TaskStatus.Completed;
+                    break;
+                case "3":
+                    newStatus = TaskStatus.Postponed;
+                    break;
+                default:
+                    Console.WriteLine("Nepostojeća opcija. Pokušajte ponovno.");
+                    return;
+            }
+
+
+            task.Status = newStatus;
+            Console.WriteLine("\nStatus zadatka je uspješno ažuriran.");
         }
         private static void ManageProject()
         {
@@ -427,7 +483,43 @@ namespace Internship_3_OOP
                 Console.Clear();
             }
         }
-        private static void ManageTask() { }
+        private static void ManageTask() {
+            var project = SelectProject();
+            Console.Clear();
+            var task = SelectTask(project);
+            Console.Clear();
+            while (true)
+            {
+                try
+                {
+                    ShowTaskManagement(task.Name);
+                    string choice = Console.ReadLine();
+                    Console.Clear();
+                    switch (choice)
+                    {
+                        case "1":
+                            ShowTaskDetails(task);
+                            break;
+                        case "2":
+                            UpdateTaskStatus(task);
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            Console.WriteLine("Nepostojeća opcija. Pokušajte ponovno.");
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("\n" + e.Message);
+                }
+
+                Console.Write("\nPritisnite bilo koju tipku za nastavak...");
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
 
         static void Main(string[] args)
         {
