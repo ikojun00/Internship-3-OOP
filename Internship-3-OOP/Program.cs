@@ -3,6 +3,7 @@ using Internship_3_OOP.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Xml.Linq;
 
@@ -11,13 +12,39 @@ namespace Internship_3_OOP
     public class Program
     {
         private static Dictionary<Project, List<Task>> projectTasks = new Dictionary<Project, List<Task>>();
+        public static string ProjectStatusToCroatian(ProjectStatus status)
+        {
+            switch (status)
+            {
+                case ProjectStatus.Active:
+                    return "Aktivan";
+                case ProjectStatus.OnHold:
+                    return "Na čekanju";
+                case ProjectStatus.Completed:
+                    return "Završen";
+                default:
+                    return status.ToString();
+            }
+        }
+        public static string TaskStatusToCroatian(TaskStatus status)
+        {
+            switch (status)
+            {
+                case TaskStatus.Active:
+                    return "Aktivan";
+                case TaskStatus.Completed:
+                    return "Završen";
+                case TaskStatus.Postponed:
+                    return "Odgođen";
+                default:
+                    return status.ToString();
+            }
+        }
         private static Task SelectTask(Project project)
         {
             var tasks = projectTasks[project];
             for (int i = 0; i < tasks.Count; i++)
-            {
                 Console.WriteLine($"{i + 1} - {tasks[i].Name}");
-            }
 
             Console.Write($"\nOdaberite zadatak iz projekta '{project.Name}' (broj): ");
             if (!int.TryParse(Console.ReadLine(), out int option) || option < 1 || option > tasks.Count)
@@ -29,9 +56,7 @@ namespace Internship_3_OOP
         {
             var projects = projectTasks.Keys.ToList();
             for (int i = 0; i < projects.Count; i++)
-            {
                 Console.WriteLine($"{i + 1} - {projects[i].Name}");
-            }
 
             Console.Write("\nOdaberite projekt (broj): ");
             if (!int.TryParse(Console.ReadLine(), out int option) || option < 1 || option > projects.Count)
@@ -113,7 +138,7 @@ namespace Internship_3_OOP
             }
             foreach (var kvp in projectTasks)
             {
-                Console.WriteLine($"'{kvp.Key.Name}'");
+                Console.WriteLine($"'{kvp.Key.Name}' ({ProjectStatusToCroatian(kvp.Key.Status)})");
                 Console.WriteLine($"Opis: {kvp.Key.Description}");
                 Console.WriteLine("Zadaci:");
 
@@ -240,7 +265,11 @@ namespace Internship_3_OOP
             }
 
             var filteredProjects = projectTasks.Keys.Where(p => p.Status == status);
-
+            if (!filteredProjects.Any())
+            {
+                Console.WriteLine("Nema projekata sa odabranim statusom.");
+                return;
+            }
             foreach (var project in filteredProjects)
             {
                 Console.WriteLine($"\nProjekt: {project.Name}");
@@ -261,7 +290,7 @@ namespace Internship_3_OOP
             Console.WriteLine($"Zadaci projekta '{project.Name}':");
             foreach (var task in tasks)
             {
-                Console.WriteLine($"- {task.Name} ({task.Status})");
+                Console.WriteLine($"- {task.Name} ({TaskStatusToCroatian(task.Status)})");
                 Console.WriteLine($"  Rok: {task.Deadline:dd.MM.yyyy.}");
                 Console.WriteLine($"  Trajanje: {task.Duration} minuta");
             }
@@ -270,7 +299,7 @@ namespace Internship_3_OOP
         {
             Console.WriteLine($"Detalji projekta '{project.Name}':");
             Console.WriteLine($"Opis: {project.Description}");
-            Console.WriteLine($"Status: {project.Status}");
+            Console.WriteLine($"Status: {ProjectStatusToCroatian(project.Status)}");
             Console.WriteLine($"Datum početka: {project.StartDate:dd.MM.yyyy.}");
             Console.WriteLine($"Datum završetka: {project.EndDate:dd.MM.yyyy.}");
         }
@@ -341,8 +370,20 @@ namespace Internship_3_OOP
             Console.Write("Opis zadatka: ");
             string description = Console.ReadLine();
 
-            Console.Write("Rok (dd.MM.yyyy.): ");
-            DateTime deadline = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy.", null);
+            DateTime deadline;
+            while (true)
+            {
+                Console.Write("Rok (dd.MM.yyyy.): ");
+                try
+                {
+                    deadline = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy.", null);
+                    break;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Pogrešan format datuma. Molimo unesite datum u formatu DD.MM.YYYY.");
+                }
+            }
 
             Console.Write("Trajanje (minute): ");
             if (!int.TryParse(Console.ReadLine(), out int duration))
@@ -380,6 +421,12 @@ namespace Internship_3_OOP
 
         private static void ShowTotalActiveTime(Project project)
         {
+            if (project.Status == ProjectStatus.Completed)
+            {
+                Console.WriteLine("Nema aktivnih zadataka u završenom projektu.");
+                return;
+            }
+
             int totalMinutes = projectTasks[project]
                 .Where(t => t.Status == TaskStatus.Active)
                 .Sum(t => t.Duration);
@@ -393,7 +440,7 @@ namespace Internship_3_OOP
         {
             Console.WriteLine($"Detalji projekta '{task.Name}':");
             Console.WriteLine($"Opis: {task.Description}");
-            Console.WriteLine($"Status: {task.Status}");
+            Console.WriteLine($"Status: {TaskStatusToCroatian(task.Status)}");
             Console.WriteLine($"Rok: {task.Deadline:dd.MM.yyyy.}");
             Console.WriteLine($"Trajanje: {task.Duration} minuta");
         }

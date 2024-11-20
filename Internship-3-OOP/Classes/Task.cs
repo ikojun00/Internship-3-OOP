@@ -85,5 +85,20 @@ namespace Internship_3_OOP.Classes
             Project = project;
             Status = TaskStatus.Active;
         }
+
+        public static string ToCroatian(TaskStatus status)
+        {
+            switch (status)
+            {
+                case TaskStatus.Active:
+                    return "Aktivan";
+                case TaskStatus.Completed:
+                    return "Završen";
+                case TaskStatus.Postponed:
+                    return "Odgođen";
+                default:
+                    return status.ToString();
+            }
+        }
     }
 }
