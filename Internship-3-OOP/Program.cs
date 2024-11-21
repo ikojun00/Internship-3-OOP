@@ -156,17 +156,34 @@ namespace Internship_3_OOP
         private static void AddNewProject() {
             Console.WriteLine("NOVI PROJEKT\n");
             string name;
-            do
+            while(true)
             {
                 Console.Write("Naziv projekta: ");
                 name = Console.ReadLine();
-                if (projectTasks.Keys.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                if(string.IsNullOrWhiteSpace(name))
                 {
-                    Console.WriteLine($"Projekt s imenom '{name}' već postoji. Molimo odaberite drugo ime.");
+                    Console.WriteLine($"Ime projekta ne može biti prazno.\n");
+                    continue;
                 }
-            } while (projectTasks.Keys.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)));
-            Console.Write("Opis projekta: ");
-            string description = Console.ReadLine();
+                else if (projectTasks.Keys.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Console.WriteLine($"Projekt s imenom '{name}' već postoji. Molimo odaberite drugo ime.\n");
+                    continue;
+                }
+                break;
+            }
+            string description;
+            while (true)
+            {
+                Console.Write("Opis projekta: ");
+                description = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    Console.WriteLine($"Opis projekta ne može biti prazan.\n");
+                    continue;
+                }
+                break;
+            }
 
             DateTime startDate;
             while (true)
@@ -357,18 +374,34 @@ namespace Internship_3_OOP
 
             Console.WriteLine("NOVI ZADATAK\n");
             string name;
-            do
+            while (true)
             {
                 Console.Write("Naziv zadatka: ");
                 name = Console.ReadLine();
-                if (projectTasks[project].Any(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Console.WriteLine($"Ime zadatka ne može biti prazno.\n");
+                    continue;
+                }
+                else if (projectTasks[project].Any(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
                 {
                     Console.WriteLine($"Zadatak s imenom '{name}' već postoji. Molimo odaberite drugo ime.");
+                    continue;
                 }
-            } while (projectTasks[project].Any(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase)));
-
-            Console.Write("Opis zadatka: ");
-            string description = Console.ReadLine();
+                break;
+            }
+            string description;
+            while (true)
+            {
+                Console.Write("Opis zadatka: ");
+                description = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    Console.WriteLine($"Opis projekta ne može biti prazan.\n");
+                    continue;
+                }
+                break;
+            }
 
             DateTime deadline;
             while (true)
@@ -384,10 +417,18 @@ namespace Internship_3_OOP
                     Console.WriteLine("Pogrešan format datuma. Molimo unesite datum u formatu DD.MM.YYYY.");
                 }
             }
-
-            Console.Write("Trajanje (minute): ");
-            if (!int.TryParse(Console.ReadLine(), out int duration))
-                throw new ArgumentException("Unos za trajanje nije broj.");
+            int duration;
+            while (true)
+            {
+                Console.Write("Trajanje (minute): ");
+                if (!int.TryParse(Console.ReadLine(), out duration))
+                {
+                    Console.WriteLine("Unos za trajanje nije broj.");
+                    continue;
+                }
+                break;
+            }
+            
 
             var task = new Task(name, description, deadline, duration, project);
             projectTasks[project].Add(task);
@@ -514,6 +555,7 @@ namespace Internship_3_OOP
                             ManageTask();
                             break;
                         case "0":
+                            Console.WriteLine($"Izašli ste iz izbornika za upravljanje projektom '{project.Name}'.");
                             return;
                         default:
                             Console.WriteLine("Nepostojeća opcija. Pokušajte ponovno.");
@@ -551,6 +593,7 @@ namespace Internship_3_OOP
                             UpdateTaskStatus(task);
                             break;
                         case "0":
+                            Console.WriteLine($"Izašli ste iz izbornika za upravljanje zadatkom '{task.Name}'.");
                             return;
                         default:
                             Console.WriteLine("Nepostojeća opcija. Pokušajte ponovno.");
